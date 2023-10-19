@@ -4,29 +4,24 @@
 //
 //  Created by Anton Petrov on 19.10.2023.
 
-// TODO: move to const
-//swiftlint: disable line_length
-
-import Foundation
 import Alamofire
+import Foundation
+
+typealias NetworkManagerProtocol = DetailsNetworkManagerProtocol & SearchNetworkManagerProtocol
 
 protocol SearchNetworkManagerProtocol {
-    func getPopularMovies(page: Int, completion: @escaping ((Result<Data, NetworkError>) -> Void))
-    func getMovies(forQuery: String, page: Int, completion: @escaping ((Result<Data, NetworkError>) -> Void))
-    func getDetailsForMovie(id: Int, completion: @escaping ((Result<Data, NetworkError>) -> Void))
-    func getGenres(completion: @escaping ((Result<Data, NetworkError>) -> Void))
+    var isConnected: Bool { get }
+    func getPopularMovies(page: Int, completion: @escaping ((Result<APIMovies, NetworkError>) -> Void))
+    func getMovies(forQuery: String, page: Int, completion: @escaping ((Result<APIMovies, NetworkError>) -> Void))
+    func getDetailsForMovie(id: Int, completion: @escaping ((Result<APIMovieDetails, NetworkError>) -> Void))
+    func getGenres(completion: @escaping ((Result<APIGenres, NetworkError>) -> Void))
 }
 
 protocol DetailsNetworkManagerProtocol {
-    func getVideos(for movieID: Int, completion: @escaping ((Result<Data, NetworkError>) -> Void))
+    func getVideos(for movieID: Int, completion: @escaping ((Result<APIVideos, NetworkError>) -> Void))
 }
 
 final class NetworkManager {
-    private let headers: HTTPHeaders = [
-        "accept": "application/json",
-        "Authorization": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIyMDc0NTNiNmM4MzA3MWY1ODc1MWY0NTE3OTJlYzMxMSIsInN1YiI6IjY1MjJhOWZjMDcyMTY2MDBhY2I4ZjkyYSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.9Q0Hs_dyRT-Xh6wMBjXLBbp6O9BUm9NkiuuFVooOq2k"
-    ]
-
     private let reachabilityManager = NetworkReachabilityManager.default
     private let session: Session
 
@@ -35,7 +30,7 @@ final class NetworkManager {
     }
 
     private func request(_ request: NetworkRequest, completion: @escaping ((Result<Data, NetworkError>) -> Void)) {
-        guard reachabilityManager?.isReachable == true else {
+        guard isConnected else {
             completion(.failure(NetworkError.noConnection))
             return
         }
@@ -43,18 +38,17 @@ final class NetworkManager {
             completion(.failure(NetworkError.invalidURL))
             return
         }
-        session.request(url, method: .get, parameters: request.parameters, headers: headers)
+        session.request(url, method: .get, parameters: request.parameters)
             .validate()
             .response { response in
-                print("DEBUG! response: \(response.debugDescription)")
                 switch response.result {
-                case .success(let data):
-                    guard let data = data else {
+                case let .success(data):
+                    guard let data else {
                         completion(.failure(NetworkError.noData))
                         return
                     }
                     completion(.success(data))
-                case .failure(let error):
+                case let .failure(error):
                     if response.response?.statusCode == 401 {
                         completion(.failure(NetworkError.unauthorized))
                     } else {
@@ -63,32 +57,64 @@ final class NetworkManager {
                 }
             }
     }
+
+    private func decodeData<T: Codable>(of type: T.Type,
+                                        from result: Result<Data, NetworkError>,
+                                        completion: @escaping ((Result<T, NetworkError>) -> Void)) {
+        switch result {
+        case let .success(data):
+            do {
+                let decoded = try JSONDecoder().decode(T.self, from: data)
+                completion(.success(decoded))
+            } catch {
+                completion(.failure(NetworkError.invalidData))
+            }
+        case let .failure(error):
+            completion(.failure(error))
+        }
+    }
 }
 
 // MARK: - SearchNetworkManagerProtocol
 
 extension NetworkManager: SearchNetworkManagerProtocol {
-    func getGenres(completion: @escaping ((Result<Data, NetworkError>) -> Void)) {
-        request(.genres, completion: completion)
+    var isConnected: Bool {
+        reachabilityManager?.isReachable ?? false
     }
 
-    func getMovies(forQuery query: String, page: Int, completion: @escaping ((Result<Data, NetworkError>) -> Void)) {
-        request(.search(query: query, page: page), completion: completion)
+    func getGenres(completion: @escaping ((Result<APIGenres, NetworkError>) -> Void)) {
+        request(.genres) { [weak self] result in
+            self?.decodeData(of: APIGenres.self, from: result, completion: completion)
+        }
     }
 
-    func getPopularMovies(page: Int, completion: @escaping ((Result<Data, NetworkError>) -> Void)) {
-        request(.popular(page: page), completion: completion)
+    func getMovies(forQuery query: String,
+                   page: Int,
+                   completion: @escaping ((Result<APIMovies, NetworkError>) -> Void)) {
+        request(.search(query: query, page: page)) { [weak self] result in
+            self?.decodeData(of: APIMovies.self, from: result, completion: completion)
+        }
     }
 
-    func getDetailsForMovie(id: Int, completion: @escaping ((Result<Data, NetworkError>) -> Void)) {
-        request(.details(movieID: id), completion: completion)
+    func getPopularMovies(page: Int, completion: @escaping ((Result<APIMovies, NetworkError>) -> Void)) {
+        request(.popular(page: page)) { [weak self] result in
+            self?.decodeData(of: APIMovies.self, from: result, completion: completion)
+        }
+    }
+
+    func getDetailsForMovie(id: Int, completion: @escaping ((Result<APIMovieDetails, NetworkError>) -> Void)) {
+        request(.details(movieID: id)) { [weak self] result in
+            self?.decodeData(of: APIMovieDetails.self, from: result, completion: completion)
+        }
     }
 }
 
 // MARK: - DetailsNetworkManagerProtocol
 
 extension NetworkManager: DetailsNetworkManagerProtocol {
-    func getVideos(for movieID: Int, completion: @escaping ((Result<Data, NetworkError>) -> Void)) {
-        request(.videos(movieID: movieID), completion: completion)
+    func getVideos(for movieID: Int, completion: @escaping ((Result<APIVideos, NetworkError>) -> Void)) {
+        request(.videos(movieID: movieID)) { [weak self] result in
+            self?.decodeData(of: APIVideos.self, from: result, completion: completion)
+        }
     }
 }
