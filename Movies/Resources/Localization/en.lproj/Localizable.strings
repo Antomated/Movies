@@ -1,0 +1,27 @@
+/* 
+  Localizable.strings
+  Movies
+
+  Created by Anton Petrov on 19.10.2023.
+  
+*/
+
+// MARK: - Search screen
+
+"searchScreenTitle" = "M O V I E S";
+"searchPlaceholder" = "Search";
+"noResultsLabel" = "No results available";
+"noPosterLabel" = "No poster available";
+"pullToRefresh" = "Pull ↓ to reload";
+
+// MARK: - Sort action sheet
+
+"sortOptionsTitle" = "Sort by:";
+"sortOptionsCancelButton" = "Cancel";
+"sortByPopularity" = "popularity ↓";
+"sortByRatingAscending" = "rating ↑";
+"sortByRatingDescending" = "rating ↓";
+"sortByNameAscending" = "name ↑";
+"sortByNameDescending" = "name ↓";
+"sortByYearAscending" = "year ↑";
+"sortByYearDescending" = "year ↓";
