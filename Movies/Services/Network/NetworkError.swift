@@ -22,7 +22,7 @@ enum NetworkError: LocalizedError {
             return LocalizedKey.networkErrorNoData.localizedString
         case .noConnection:
             return LocalizedKey.networkErrorNoConnection.localizedString
-        case .requestFailed(underlyingError: let underlyingError):
+        case let .requestFailed(underlyingError: underlyingError):
             return LocalizedKey.networkErrorRequestFailed.localizedString + "\(underlyingError.localizedDescription)"
         case .invalidData:
             return LocalizedKey.networkErrorInvalidData.localizedString
@@ -30,8 +30,8 @@ enum NetworkError: LocalizedError {
             return LocalizedKey.networkErrorInvalidURL.localizedString
         case .unauthorized:
             return LocalizedKey.networkErrorUnauthorized.localizedString
-        case .decodingFailed(underlyingError: let underlyingError):
-            return LocalizedKey.networkErrorRequestFailed.localizedString + "\(underlyingError.localizedDescription)"
+        case let .decodingFailed(underlyingError: underlyingError):
+            return LocalizedKey.networkErrorDecodingFailed.localizedString + "\(underlyingError.localizedDescription)"
         }
     }
 }
