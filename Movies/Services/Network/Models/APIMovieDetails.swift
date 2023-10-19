@@ -16,6 +16,7 @@ struct APIMovieDetails: Codable {
     let overview: String
     let rating: Double
     let video: Bool
+    let votes: Int
     let posterPath: String?
     let backdropPath: String?
 
@@ -28,6 +29,7 @@ struct APIMovieDetails: Codable {
         case overview
         case rating = "vote_average"
         case video
+        case votes = "vote_count"
         case posterPath = "poster_path"
         case backdropPath = "backdrop_path"
     }
