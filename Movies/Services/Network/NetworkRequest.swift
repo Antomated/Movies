@@ -21,23 +21,24 @@ enum NetworkRequest {
                 return "search/movie"
             case .popular:
                 return "movie/popular"
-            case .details(let movieID):
+            case let .details(movieID):
                 return "movie/\(movieID)"
             case .genres:
                 return "genre/movie/list"
-            case .videos(let movieID):
+            case let .videos(movieID):
                 return "movie/\(movieID)/videos"
             }
         }()
     }
 
     var parameters: [String: Any] {
-        var params: [String: Any] = ["language": Locale.current.languageCode ?? "en"]
+        var params: [String: Any] = ["language": Locale.current.languageCode ?? "en",
+                                     "api_key": Constants.API.apiKey]
         switch self {
-        case .search(let query, let page):
+        case let .search(query, page):
             params["query"] = query
             params["page"] = page
-        case .popular(let page):
+        case let .popular(page):
             params["page"] = page
         case .details, .genres, .videos:
             break
