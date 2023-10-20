@@ -4,7 +4,6 @@
 //
 //  Created by Anton Petrov on 18.10.2023.
 //
-// TODO: Draft
 
 import UIKit
 
@@ -12,9 +11,9 @@ final class SearchViewController: UIViewController {
     // MARK: - UI Elements
 
     private lazy var sortButton = UIBarButtonItem(image: Constants.SystemImage.sortIcon.image,
-                                             style: .plain,
-                                             target: self,
-                                             action: #selector(didTapSortButton))
+                                                  style: .plain,
+                                                  target: self,
+                                                  action: #selector(didTapSortButton))
 
     private let loadingIndicator = UIActivityIndicatorView(style: .large).configure {
         $0.startAnimating()
@@ -35,7 +34,7 @@ final class SearchViewController: UIViewController {
         $0.smartQuotesType = .no
     }
 
-    private let noDataLabel = UILabel().configure {
+    private let noSearchResultsLabel = UILabel().configure {
         $0.text = LocalizedKey.noResultsLabel.localizedString
         $0.textAlignment = .center
         $0.font = .boldSystemFont(ofSize: 20)
@@ -49,10 +48,12 @@ final class SearchViewController: UIViewController {
 
     // MARK: - Properties
 
-    private let checkedActionSheetKey = "checked"
-    private let cellToScreenHeightRatio: CGFloat = 1/3
-    private let mediumPadding = Constants.StyleDefaults.mediumPadding
+    weak var coordinator: MainCoordinatorProtocol?
     private let viewModel: SearchViewModelProtocol
+    private let checkedActionSheetKey = "checked"
+    private let cellToScreenHeightRatio: CGFloat = 1 / 3
+    private let mediumPadding = Constants.StyleDefaults.mediumPadding
+
     private var isLoading = false {
         didSet {
             if isLoading {
@@ -84,45 +85,66 @@ final class SearchViewController: UIViewController {
         setupSearchBar()
         setupTableView()
         setupNoDataLabel()
-        reloadData()
+        setupErrorCallback()
+        fetchMovies()
     }
 
     // MARK: - Actions
 
-    @objc private func refreshControlReload() {
-        reloadData(reloadAll: true)
+    @objc private func refreshTableView() {
+        fetchMovies(withReload: true)
     }
 
     @objc private func didTapSortButton() {
-        let alert = UIAlertController(title: nil,
-                                      message: LocalizedKey.sortOptionsTitle.localizedString,
-                                      preferredStyle: .actionSheet)
-        SortOption.allCases.forEach { option in
-            let action = UIAlertAction(title: option.title, style: .default) { [weak self] _ in
-                self?.viewModel.selectSorting(option: option)
+        let alertController = UIAlertController(title: nil,
+                                                message: LocalizedKey.sortOptionsTitle.localizedString,
+                                                preferredStyle: .actionSheet)
+        for (index, option) in viewModel.sortOptions.enumerated() {
+            let action = UIAlertAction(title: option, style: .default) { [weak self] _ in
+                self?.viewModel.selectSortOption(atIndex: index)
                 self?.tableView.reloadData()
             }
-            if option == viewModel.selectedSorting {
+            if index == viewModel.sortOption.rawValue {
                 action.setValue(true, forKey: checkedActionSheetKey)
             }
-            alert.addAction(action)
+            alertController.addAction(action)
         }
-        alert.addAction(UIAlertAction(title: LocalizedKey.sortOptionsCancelButton.localizedString, style: .cancel))
-        present(alert, animated: true)
+        alertController.addAction(UIAlertAction(title: LocalizedKey.sortOptionsCancelButton.localizedString,
+                                                style: .cancel))
+        if let popoverController = alertController.popoverPresentationController {
+            popoverController.barButtonItem = sortButton
+        }
+
+        present(alertController, animated: true)
     }
 
     // MARK: - Reload
 
-    // TODO: fix?
-    private func reloadData(reloadAll: Bool = false) {
+    private func fetchMovies(withReload reload: Bool = false) {
         guard !isLoading else { return }
         isLoading = true
-        viewModel.getMovies(reloadAll: reloadAll) { [weak self] in
-            DispatchQueue.main.async { [weak self] in
-                self?.isLoading = false
-                self?.refreshControl.endRefreshing()
-                self?.tableView.reloadData()
-                self?.setupNoDataLabel()
+        viewModel.getMovies(withReload: reload) { [weak self] in
+            guard let self else { return }
+            DispatchQueue.main.async {
+                self.isLoading = false
+                self.setupNoDataLabel()
+                self.refreshControl.endRefreshing()
+                self.tableView.reloadData()
+            }
+        }
+    }
+
+    private func showLoadingIndicator() {
+        loadingIndicator.startAnimating()
+        navigationItem.rightBarButtonItem = UIBarButtonItem(customView: loadingIndicator)
+    }
+
+    private func setupErrorCallback() {
+        viewModel.onErrorOccurred = { [weak self] error in
+            guard let self, let error else { return }
+            DispatchQueue.main.async {
+                self.tableView.contentOffset = .zero
+                self.coordinator?.showAlert(message: error)
             }
         }
     }
@@ -137,7 +159,7 @@ final class SearchViewController: UIViewController {
 
     private func setupTableView() {
         tableView.refreshControl = refreshControl
-        refreshControl.addTarget(self, action: #selector(refreshControlReload), for: .valueChanged)
+        refreshControl.addTarget(self, action: #selector(refreshTableView), for: .valueChanged)
         tableView.register(SearchTableViewCell.self, forCellReuseIdentifier: SearchTableViewCell.reuseIdentifier)
         tableView.delegate = self
         tableView.dataSource = self
@@ -150,17 +172,15 @@ final class SearchViewController: UIViewController {
     }
 
     private func setupNoDataLabel() {
-        view.addSubview(noDataLabel)
-        noDataLabel.center(inView: tableView)
-        noDataLabel.anchor(left: view.leftAnchor,
-                           right: view.rightAnchor,
-                           paddingLeft: mediumPadding,
-                           paddingRight: mediumPadding)
-    }
-
-    private func showLoadingIndicator() {
-        loadingIndicator.startAnimating()
-        navigationItem.rightBarButtonItem = UIBarButtonItem(customView: loadingIndicator)
+        noSearchResultsLabel.isHidden = viewModel.numberOfItems > 0
+        view.addSubview(noSearchResultsLabel)
+        noSearchResultsLabel.anchor(top: tableView.topAnchor,
+                                    left: view.leftAnchor,
+                                    bottom: tableView.centerYAnchor,
+                                    right: view.rightAnchor,
+                                    paddingTop: mediumPadding,
+                                    paddingLeft: mediumPadding,
+                                    paddingRight: mediumPadding)
     }
 
     private func setupSortingButton() {
@@ -168,14 +188,19 @@ final class SearchViewController: UIViewController {
     }
 }
 
+// MARK: - UITableViewDataSource
+
 extension SearchViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         viewModel.numberOfItems
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: SearchTableViewCell.reuseIdentifier, for: indexPath) as? SearchTableViewCell else { return UITableViewCell() }
-        let movie = viewModel.movies[indexPath.row]
+        guard indexPath.row < viewModel.numberOfItems,
+              let cell = tableView.dequeueReusableCell(withIdentifier: SearchTableViewCell.reuseIdentifier,
+                                                       for: indexPath) as? SearchTableViewCell,
+              let movie = viewModel.movies.safeElement(at: indexPath.row)
+        else { return UITableViewCell() }
         cell.configure(with: movie)
         return cell
     }
@@ -183,17 +208,22 @@ extension SearchViewController: UITableViewDataSource {
 
 extension SearchViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        viewModel.navigateToMovieDetail(index: indexPath.row)
         tableView.deselectRow(at: indexPath, animated: true)
+        viewModel.getDetailsForMovie(atIndex: indexPath.row) { [weak self] movieDetails in
+            guard let self, let movieDetails else { return }
+            self.coordinator?.showDetails(for: movieDetails)
+        }
     }
 
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        let lastIndex = viewModel.movies.count - 1
-        if indexPath.row == lastIndex && !isLoading {
-            reloadData()
+        let lastIndex = viewModel.numberOfItems - Int(1 / cellToScreenHeightRatio) * 2
+        if indexPath.row == lastIndex && !isLoading && viewModel.canLoadMoreData {
+            fetchMovies()
         }
     }
 }
+
+// MARK: - UISearchBarDelegate
 
 extension SearchViewController: UISearchBarDelegate {
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
@@ -206,7 +236,8 @@ extension SearchViewController: UISearchBarDelegate {
 
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         searchBar.resignFirstResponder()
-        viewModel.setSearchString(string: searchBar.text ?? "")
-        reloadData()
+        tableView.contentOffset = .zero
+        viewModel.setSearch(query: searchBar.text ?? "")
+        fetchMovies()
     }
 }
