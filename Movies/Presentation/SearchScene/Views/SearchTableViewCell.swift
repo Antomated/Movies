@@ -18,10 +18,11 @@ final class SearchTableViewCell: UITableViewCell {
         $0.layer.shadowRadius = 3
         $0.layer.shadowOpacity = 0.4
         $0.layer.borderColor = UIColor.darkGray.cgColor
-        $0.layer.borderWidth = 0.2
+        $0.layer.borderWidth = 0.5
     }
 
     private let posterImageView = UIImageView().configure {
+        $0.kf.indicatorType = .activity
         $0.contentMode = .scaleAspectFill
         $0.clipsToBounds = true
         $0.layer.cornerRadius = Constants.StyleDefaults.cornerRadius
@@ -29,20 +30,10 @@ final class SearchTableViewCell: UITableViewCell {
 
     private let gradientLayer = CAGradientLayer().configure {
         $0.colors = [UIColor.black.cgColor, UIColor.clear.cgColor, UIColor.clear.cgColor, UIColor.black.cgColor]
-        $0.locations = [0, 0.3, 0.8, 1]
+        $0.locations = [0, 0.3, 0.7, 1]
     }
 
-    private let noPosterLabel = UILabel().configure {
-        $0.text = LocalizedKey.noPosterLabel.localizedString
-        $0.textColor = .lightGray
-        $0.textAlignment = .center
-        $0.isHidden = true
-        $0.font = .boldSystemFont(ofSize: 20)
-    }
-
-    private let activityIndicator = UIActivityIndicatorView(style: .large).configure {
-        $0.hidesWhenStopped = true
-    }
+    private let noPosterLabel = NoPosterLabel()
 
     private let topHorizontalStackView = UIStackView().configure {
         $0.alignment = .top
@@ -67,7 +58,7 @@ final class SearchTableViewCell: UITableViewCell {
     }
 
     private let genresLabel = UILabel().configure {
-        $0.font = .italicSystemFont(ofSize: 12)
+        $0.font = .italicSystemFont(ofSize: 13)
         $0.textColor = .white
     }
 
@@ -78,18 +69,21 @@ final class SearchTableViewCell: UITableViewCell {
     static let reuseIdentifier = String(describing: SearchTableViewCell.self)
     private let smallPadding = Constants.StyleDefaults.smallPadding
     private let mediumPadding = Constants.StyleDefaults.mediumPadding
-    private let ratingViewSideSize: CGFloat = 52
+    private let bigItemSideSize = Constants.StyleDefaults.bigItemSideSize
+    private let loaderFadeInterval: TimeInterval = 0.3
 
     // MARK: - Initialization
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
+        selectionStyle = .none
         setupContainerView()
         setupImageView()
         setupTopElements()
         setupBottomElements()
     }
 
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -105,12 +99,12 @@ final class SearchTableViewCell: UITableViewCell {
     override func prepareForReuse() {
         super.prepareForReuse()
         posterImageView.kf.cancelDownloadTask()
-        activityIndicator.stopAnimating()
         posterImageView.image = nil
         titleLabel.text = nil
         yearLabel.text = nil
         genresLabel.text = nil
-        ratingView.configure(with: 0, votes: 0)
+        noPosterLabel.isHidden = true
+        ratingView.configure(withRating: 0, votes: 0)
     }
 
     // MARK: - Configuration
@@ -118,22 +112,18 @@ final class SearchTableViewCell: UITableViewCell {
     func configure(with movie: Movie) {
         titleLabel.text = movie.title
         yearLabel.text = movie.year
-        genresLabel.text = movie.genres.map { $0.name }.joined(separator: " • ")
-        ratingView.configure(with: movie.rating, votes: movie.votes)
-        if let urlString = movie.backdropImageURLString ?? movie.posterImageURLString,
-           let url = URL(string: urlString) {
-            activityIndicator.startAnimating()
-            posterImageView.kf.setImage(with: url) { result in
-                switch result {
-                case .success:
-                    self.noPosterLabel.isHidden = true
-                case .failure:
-                    self.noPosterLabel.isHidden = false
-                }
-                self.activityIndicator.stopAnimating()
+        genresLabel.text = movie.genres.map { $0.name }.joined(separator: Constants.StyleDefaults.pointSeparator)
+        ratingView.configure(withRating: movie.rating, votes: movie.votes)
+        let url = URL(string: movie.backdropImageURLString ?? movie.posterImageURLString ?? "")
+        posterImageView.kf.setImage(with: url,
+                                    options: [.transition(.fade(loaderFadeInterval))]) { [weak self] result in
+            guard let self else { return }
+            switch result {
+            case .success:
+                self.noPosterLabel.isHidden = true
+            case .failure:
+                self.noPosterLabel.isHidden = false
             }
-        } else {
-            noPosterLabel.isHidden = false
         }
     }
 
@@ -156,8 +146,6 @@ final class SearchTableViewCell: UITableViewCell {
         posterImageView.fillSuperview()
         posterImageView.layer.addSublayer(gradientLayer)
         gradientLayer.frame = posterImageView.bounds
-        posterImageView.addSubview(activityIndicator)
-        activityIndicator.center(inView: posterImageView)
         posterImageView.addSubview(noPosterLabel)
         noPosterLabel.fillSuperview()
     }
@@ -184,6 +172,6 @@ final class SearchTableViewCell: UITableViewCell {
                                          paddingRight: mediumPadding)
         bottomHorizontalStackView.addArrangedSubview(genresLabel)
         bottomHorizontalStackView.addArrangedSubview(ratingView)
-        ratingView.setDimensions(height: ratingViewSideSize, width: ratingViewSideSize)
+        ratingView.setDimensions(height: bigItemSideSize, width: bigItemSideSize)
     }
 }
