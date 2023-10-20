@@ -52,6 +52,7 @@ final class RatingView: UIView {
         setupViews()
     }
 
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -65,7 +66,7 @@ final class RatingView: UIView {
 
     // MARK: - Configuration
 
-    func configure(with rating: CGFloat, votes: Int) {
+    func configure(withRating rating: CGFloat, votes: Int) {
         guard rating >= 0, rating <= maxRating else { return }
         ratingLabel.text = String(format: decimalStringFormat, rating)
         diagramLayer.strokeColor = getColor(for: rating).cgColor
