@@ -7,163 +7,313 @@
 
 import Foundation
 
-protocol SearchViewModelProtocol {
+protocol SearchViewModelProtocol: AnyObject {
     var movies: [Movie] { get }
-    var selectedSorting: SortOption { get }
+    var sortOption: SortOption { get }
     var numberOfItems: Int { get }
+    var canLoadMoreData: Bool { get }
+    var onErrorOccurred: ((String?) -> Void)? { get set }
 
-    func selectSorting(option: SortOption)
-    func setSearchString(string: String)
+    func setSearch(query: String)
+    func getMovies(withReload: Bool, completion: @escaping (() -> Void))
+    func getDetailsForMovie(atIndex: Int, completion: @escaping ((MovieDetails?) -> Void))
+    func selectSortOption(atIndex: Int)
     func cancelSearch()
-    func getMovies(reloadAll: Bool, completion: @escaping (() -> Void))
-    func navigateToMovieDetail(index: Int)
 }
 
 extension SearchViewModelProtocol {
     var numberOfItems: Int {
         movies.count
     }
+
+    var sortOptions: [String] {
+        SortOption.allCases.map { $0.title }
+    }
 }
 
-final class SearchViewModel {
-    var moviesProvider: MoviesListProviderProtocol
-    var router: MoviesListRouterProtocol
+final class SearchViewModel: SearchViewModelProtocol {
+    // MARK: - Dependencies
 
+    private let networkManager: SearchNetworkManagerProtocol
+    private let formatter = DateFormatter().configure {
+        $0.dateFormat = "YYYY-MM-dd"
+    }
+
+    // MARK: - Properties
+
+    private enum SearchState {
+        case popular
+        case search
+        case offlineSearch
+    }
+
+    private var searchState: SearchState = .popular
     private var popularMovies = [Movie]()
     private var sortedMovies = [Movie]()
     private var searchedMovies = [Movie]()
-    private var searchedSorted = [Movie]()
-    private let maxPages = 500
-    private var searchMaxPages = 500
-
-    private var isSearching = false {
-        didSet {
-            if !isSearching {
-                searchMaxPages = 500
-            }
-        }
-    }
+    private var searchedSortedMovies = [Movie]()
     private var searchString = ""
-
-    var selectedSorting = SortOption.popularity
-
-    init(moviesProvider: MoviesListProviderProtocol, router: MoviesListRouterProtocol) {
-        self.moviesProvider = moviesProvider
-        self.router = router
-    }
-
-    private func sortMovies(_ movies: [Movie]) -> [Movie] {
-        switch selectedSorting {
-        case .popularity: return movies
-        case .nameAscending: return movies.sorted(by: { $0.title < $1.title })
-        case .nameDescending: return movies.sorted(by: { $0.title > $1.title })
-        case .yearAscending: return movies.sorted(by: { $0.year < $1.year })
-        case .yearDescending: return movies.sorted(by: { $0.year > $1.year })
-        case .ratingAscending: return movies.sorted(by: { $0.rating < $1.rating })
-        case .ratingDescending: return movies.sorted(by: { $0.rating > $1.rating })
-        }
-    }
-
-    private func getMovieDetail(for index: Int, completion: @escaping ((Result<MovieDetails, NetworkError>) -> Void)) {
-        let movie = isSearching ? searchedMovies[index].id : sortedMovies[index].id
-        moviesProvider.getMovieDetail(for: movie, completion: completion)
-    }
-
-    private func getPopularMovies(reloadAll: Bool = false, completion: @escaping (() -> Void)) {
-        let page = reloadAll ? 1 : (popularMovies.count / 20) + 1
-
-        guard page <= maxPages else {
-            completion()
-            return
-        }
-
-        moviesProvider.getPopularMovies(page: page) { [weak self] result in
-            switch result {
-            case .success(let list):
-                if reloadAll {
-                    self?.popularMovies.removeAll()
-                }
-                self?.popularMovies.append(contentsOf: list.results)
-                self?.sortedMovies += self?.sortMovies(list.results) ?? []
-                completion()
-            case .failure(let error):
-                self?.router.presentError(error) {
-                    completion()
-                }
-            }
-        }
-    }
-
-    private func searchMovies(by name: String, reloadAll: Bool = false, completion: @escaping (() -> Void)) {
-        let page = reloadAll ? 1 : Int(ceil(Float(searchedMovies.count) / 20) + 1)
-
-        guard page <= searchMaxPages else {
-            completion()
-            return
-        }
-
-        moviesProvider.searchMovie(by: name, page: page) { [weak self] result in
-            switch result {
-            case .success(let list):
-                if reloadAll {
-                    self?.searchedMovies.removeAll()
-                }
-                self?.searchedMovies.append(contentsOf: list.results)
-                self?.searchedSorted += self?.sortMovies(list.results) ?? []
-                self?.searchMaxPages = list.totalPages
-                completion()
-            case .failure(let error):
-                self?.searchedMovies = self?.sortedMovies.filter { $0.title.contains(name) } ?? []
-                self?.router.presentError(error) {
-                    completion()
-                }
-            }
-        }
-    }
-}
-
-extension SearchViewModel: SearchViewModelProtocol {
+    private var hasReachedEnd = false
+    private(set) var sortOption = SortOption.defaultOption
+    private var genres = [APIGenre]()
     var movies: [Movie] {
-        isSearching
-        ? selectedSorting == .popularity ? searchedMovies : searchedSorted
-        : selectedSorting == .popularity ? popularMovies : sortedMovies
+        switch searchState {
+        case .popular:
+            return sortOption == .defaultOption ? popularMovies : sortedMovies
+        case .search:
+            return sortOption == .defaultOption ? searchedMovies : searchedSortedMovies
+        case .offlineSearch:
+            return sortOption == .defaultOption ? searchedMovies : searchedSortedMovies
+        }
     }
 
-    func selectSorting(option: SortOption) {
-        selectedSorting = option
-        searchedSorted = sortMovies(searchedMovies)
+    var canLoadMoreData: Bool {
+        !hasReachedEnd
+    }
+
+    init(networkManager: SearchNetworkManagerProtocol) {
+        self.networkManager = networkManager
+        getGenres()
+    }
+
+    // MARK: - View Modeling
+
+    var onErrorOccurred: ((String?) -> Void)?
+
+    func selectSortOption(atIndex index: Int) {
+        sortOption = SortOption(rawValue: index) ?? .defaultOption
+        searchedSortedMovies = sortMovies(searchedMovies)
         sortedMovies = sortMovies(popularMovies)
     }
 
-    func getMovies(reloadAll: Bool = false, completion: @escaping (() -> Void)) {
-        if isSearching {
-            searchMovies(by: searchString, reloadAll: reloadAll, completion: completion)
-        } else {
-            getPopularMovies(reloadAll: reloadAll, completion: completion)
+    func getMovies(withReload reload: Bool = false, completion: @escaping (() -> Void)) {
+        getGenres()
+        guard !hasReachedEnd else { return completion() }
+        switch searchState {
+        case .popular:
+            getPopularMovies(withReload: reload, completion: completion)
+        case .search:
+            searchMovies(by: searchString, withReload: reload, completion: completion)
+        case .offlineSearch:
+            searchedMovies = popularMovies.filter { $0.title.lowercased().contains(searchString.lowercased()) }
+            searchedSortedMovies = sortMovies(searchedMovies)
+            completion()
         }
     }
 
-    func navigateToMovieDetail(index: Int) {
-        getMovieDetail(for: index) { [weak self] result in
+    func getDetailsForMovie(atIndex index: Int, completion: @escaping ((MovieDetails?) -> Void)) {
+        getGenres()
+        guard let movieId = movies.safeElement(at: index)?.id else {
+            completion(nil)
+            self.onErrorOccurred?(LocalizedKey.networkErrorRequestFailed.localizedString)
+            return
+        }
+        getDetails(for: movieId) { [weak self] result in
+            guard let self else { return }
             switch result {
-            case .success(let details):
-                self?.router.navigateToMovieDetails(movieDetails: details)
-            case .failure(let error):
-                self?.router.presentError(error) {}
+            case let .success(details):
+                completion(details)
+            case let .failure(error):
+                completion(nil)
+                self.onErrorOccurred?(error.errorDescription)
             }
         }
     }
 
-    func setSearchString(string: String) {
+    func setSearch(query string: String) {
         guard !string.isEmpty else { return }
         searchString = string
+        sortOption = .defaultOption
+        hasReachedEnd = false
+        if networkManager.isConnected {
+            searchState = .search
+        } else {
+            if searchState != .offlineSearch {
+                self.onErrorOccurred?(NetworkError.noConnection.errorDescription)
+            }
+            searchState = .offlineSearch
+        }
         searchedMovies.removeAll()
-        isSearching = true
     }
 
     func cancelSearch() {
         searchString = ""
-        isSearching = false
+        hasReachedEnd = false
+        searchState = .popular
         searchedMovies.removeAll()
+    }
+
+    // MARK: - Private helpers
+
+    private func getPopularMovies(page: Int,
+                                  completion: @escaping ((Result<Movies, NetworkError>) -> Void)) {
+        networkManager.getPopularMovies(page: page) { [weak self] result in
+            guard let self else { return }
+            self.handleMoviesResult(result, completion: completion)
+        }
+    }
+
+    private func searchMovie(by name: String,
+                             page: Int,
+                             completion: @escaping ((Result<Movies, NetworkError>) -> Void)) {
+        networkManager.getMovies(forQuery: name, page: page) { [weak self] result in
+            guard let self else { return }
+            self.handleMoviesResult(result, completion: completion)
+        }
+    }
+
+    private func getDetails(for movieID: Int,
+                            completion: @escaping ((Result<MovieDetails, NetworkError>) -> Void)) {
+        networkManager.getDetailsForMovie(id: movieID) { [weak self] result in
+            guard let self else { return }
+            switch result {
+            case let .success(details):
+                let countries = details.productionCountries.map { $0.name }
+                let year = self.extractYear(from: details.releaseDate)
+                let posterURL = self.getImageURL(for: details.posterPath, imageSize: .original)
+                let backdropURL = self.getImageURL(for: details.backdropPath, imageSize: .original)
+                let detail = MovieDetails(id: details.id,
+                                          genres: details.genres,
+                                          title: details.title,
+                                          countries: countries,
+                                          year: year,
+                                          rating: details.rating,
+                                          votes: details.votes,
+                                          overview: details.overview,
+                                          video: details.video,
+                                          posterImageURLString: posterURL,
+                                          backdropImageURLString: backdropURL)
+                completion(.success(detail))
+            case let .failure(error):
+                completion(.failure(error))
+            }
+        }
+    }
+
+    private func getImageURL(for path: String?, imageSize: ImageSizeQuery) -> String? {
+        guard let path else { return nil }
+        return Constants.API.baseImageUrl + imageSize.rawValue + path
+    }
+
+    private func getGenres() {
+        guard genres.isEmpty else { return }
+        networkManager.getGenres { [weak self] result in
+            guard let self else { return }
+            switch result {
+            case let .success(genres):
+                self.genres = genres.genres
+            case let .failure(error):
+                self.onErrorOccurred?(error.errorDescription)
+            }
+        }
+    }
+
+    private func sortMovies(_ movies: [Movie]) -> [Movie] {
+        switch sortOption {
+        case .nameAscending:
+            return movies.sorted(by: { $0.title < $1.title })
+        case .nameDescending:
+            return movies.sorted(by: { $0.title > $1.title })
+        case .yearAscending:
+            return movies.sorted(by: { $0.year < $1.year })
+        case .yearDescending:
+            return movies.sorted(by: { $0.year > $1.year })
+        case .ratingAscending:
+            return movies.sorted(by: { $0.rating < $1.rating })
+        case .ratingDescending:
+            return movies.sorted(by: { $0.rating > $1.rating })
+        case .votesAscending:
+            return movies.sorted(by: { $0.votes < $1.votes })
+        case .votesDescending:
+            return movies.sorted(by: { $0.votes > $1.votes })
+        case .defaultOption:
+            return movies
+        }
+    }
+
+    private func getPopularMovies(withReload: Bool = false,
+                                  completion: @escaping (() -> Void)) {
+        let page = withReload ? 1 : (popularMovies.count / 20) + 1
+        getPopularMovies(page: page) { [weak self] result in
+            guard let self else { return }
+            switch result {
+            case let .success(list):
+                if withReload {
+                    self.popularMovies.removeAll()
+                }
+                self.popularMovies.append(contentsOf: list.results)
+                self.sortedMovies += self.sortMovies(list.results)
+                self.hasReachedEnd = list.results.isEmpty
+                completion()
+            case let .failure(error):
+                self.onErrorOccurred?(error.errorDescription)
+                completion()
+            }
+        }
+    }
+
+    private func searchMovies(by name: String,
+                              withReload: Bool = false,
+                              completion: @escaping (() -> Void)) {
+        let page = withReload ? 1 : Int(ceil(Float(searchedMovies.count) / 20) + 1)
+        searchMovie(by: name, page: page) { [weak self] result in
+            guard let self else { return }
+            switch result {
+            case let .success(list):
+                if withReload {
+                    self.searchedMovies.removeAll()
+                }
+                self.searchedMovies.append(contentsOf: list.results)
+                self.searchedSortedMovies += self.sortMovies(list.results)
+                self.hasReachedEnd = list.results.isEmpty
+                completion()
+            case let .failure(error):
+                self.onErrorOccurred?(error.errorDescription)
+                completion()
+            }
+        }
+    }
+
+    private func convert(movies: [APIMovie]) -> [Movie] {
+        var result = [Movie]()
+        for movie in movies {
+            let year = extractYear(from: movie.releaseDate)
+            let genres = genres.filter { movie.genresIDs.contains($0.id) }
+            let mov = Movie(id: movie.id,
+                            rating: movie.rating,
+                            votes: movie.votes,
+                            year: year,
+                            title: movie.title,
+                            posterImageURLString: getImageURL(for: movie.posterPath,
+                                                              imageSize: .small),
+                            backdropImageURLString: getImageURL(for: movie.backdropPath,
+                                                                imageSize: .medium),
+                            genres: genres,
+                            video: movie.video)
+            result.append(mov)
+        }
+        return result
+    }
+
+    private func extractYear(from date: String) -> String {
+        guard let date = formatter.date(from: date) else { return "" }
+        let calendar = Calendar.current
+        let year = calendar.component(.year, from: date)
+        return "\(year)"
+    }
+
+    private func handleMoviesResult(_ result: Result<APIMovies, NetworkError>,
+                                    completion: @escaping ((Result<Movies, NetworkError>) -> Void)) {
+        switch result {
+        case let .success(result):
+            let movies = convert(movies: result.movies)
+            let list = Movies(results: movies, totalPages: result.totalPages)
+            completion(.success(list))
+        case let .failure(error):
+            if case NetworkError.noConnection = error {
+                searchState = .offlineSearch
+            }
+            completion(.failure(error))
+        }
     }
 }
