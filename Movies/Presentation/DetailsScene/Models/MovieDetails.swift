@@ -6,3 +6,17 @@
 //
 
 import Foundation
+
+struct MovieDetails {
+    let id: Int
+    let genres: [APIGenre]
+    let title: String
+    let countries: [String]
+    let year: String
+    let rating: Double
+    let votes: Int
+    let overview: String
+    let video: Bool
+    let posterImageURLString: String?
+    let backdropImageURLString: String?
+}
