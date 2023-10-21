@@ -9,7 +9,7 @@ import Kingfisher
 import UIKit
 
 final class PosterViewController: UIViewController {
-    // MARK: - UI elements & properties
+    // MARK: - UI Elements
 
     private let scrollView = UIScrollView().configure {
         $0.minimumZoomScale = 1.0
@@ -22,7 +22,10 @@ final class PosterViewController: UIViewController {
 
     private let posterImageView = UIImageView().configure {
         $0.contentMode = .scaleAspectFit
+        $0.kf.indicatorType = .activity
     }
+
+    // MARK: - Properties
 
     private let posterUrlString: String
 
@@ -61,9 +64,9 @@ final class PosterViewController: UIViewController {
     private func setupScrollView() {
         view.addSubview(scrollView)
         scrollView.anchor(top: view.safeAreaLayoutGuide.topAnchor,
-                       left: view.leftAnchor,
-                       bottom: view.bottomAnchor,
-                       right: view.rightAnchor)
+                          left: view.leftAnchor,
+                          bottom: view.bottomAnchor,
+                          right: view.rightAnchor)
         scrollView.addSubview(posterImageView)
         posterImageView.center(inView: scrollView)
         let layoutFrame = scrollView.frameLayoutGuide.layoutFrame
