@@ -40,7 +40,7 @@ final class DetailsViewModel: DetailsViewModelProtocol {
     func getLatestTrailer(completion: @escaping ((Bool) -> Void)) {
         fetchLatestTrailer(for: movieDetails.id) { [weak self] result in
             switch result {
-            case .success(let urlString):
+            case let .success(urlString):
                 guard let urlString else {
                     completion(false)
                     return
@@ -60,7 +60,7 @@ final class DetailsViewModel: DetailsViewModelProtocol {
         networkManager.getVideos(for: movieID) { [weak self] result in
             guard let self else { return }
             switch result {
-            case .success(let videos):
+            case let .success(videos):
                 let baseVideoURL = Constants.API.youtubeVideoBaseUrl
                 var latestVideoKey = String()
                 var latestDate = Date(timeIntervalSince1970: .zero)
@@ -76,7 +76,7 @@ final class DetailsViewModel: DetailsViewModelProtocol {
                 }
                 let result = latestVideoKey.isEmpty ? nil : baseVideoURL + latestVideoKey
                 completion(.success(result))
-            case .failure(let error):
+            case let .failure(error):
                 completion(.failure(error))
             }
         }
