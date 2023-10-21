@@ -5,8 +5,8 @@
 //  Created by Anton Petrov on 19.10.2023.
 //
 
-import UIKit
 import Kingfisher
+import UIKit
 
 final class DetailsViewController: UIViewController {
     // MARK: - UI Elements
@@ -21,6 +21,7 @@ final class DetailsViewController: UIViewController {
 
     private let posterImageView = UIImageView().configure {
         $0.contentMode = .scaleAspectFill
+        $0.kf.indicatorType = .activity
         $0.layer.shadowRadius = 10
         $0.layer.shadowOpacity = 0.6
         $0.layer.cornerRadius = Constants.StyleDefaults.cornerRadius
@@ -47,7 +48,6 @@ final class DetailsViewController: UIViewController {
         $0.numberOfLines = 0
     }
 
-    private let activityIndicator = UIActivityIndicatorView()
     private let horizontalStackView = UIStackView().configure {
         $0.distribution = .equalCentering
         $0.spacing = 10
@@ -63,6 +63,7 @@ final class DetailsViewController: UIViewController {
         $0.layer.borderWidth = 1
         $0.isHidden = true
     }
+
     private let movieTrailerPlaceholder = UIView()
 
     private let ratingView = RatingView()
@@ -72,29 +73,21 @@ final class DetailsViewController: UIViewController {
         $0.font = .italicSystemFont(ofSize: 16)
     }
 
-    private let noPosterLabel = UILabel().configure {
-        $0.text = LocalizedKey.noPosterLabel.localizedString
-        $0.textColor = .white
-        $0.backgroundColor = .black
-        $0.numberOfLines = 0
-        $0.textAlignment = .center
-        $0.isHidden = true
-        $0.layer.cornerRadius = Constants.StyleDefaults.cornerRadius
-        $0.font = .boldSystemFont(ofSize: 20)
-    }
+    private let noPosterLabel = NoPosterLabel()
 
     // MARK: - Properties
 
-    private let viewModel: MovieDetailsViewModelProtocol
+    weak var coordinator: MainCoordinatorProtocol?
+    private let viewModel: DetailsViewModelProtocol
     private let mediumPadding = Constants.StyleDefaults.mediumPadding
-    private let pointSeparator = Constants.StyleDefaults.pointSeparator
     private let bigItemSideSize = Constants.StyleDefaults.bigItemSideSize
     private let lineSeparator = "\n"
-    private let posterAspectRatio: CGFloat = 10/15
+    private let posterAspectRatio: CGFloat = 10 / 15
+    private let loaderFadeInterval: TimeInterval = 0.3
 
     // MARK: - Initialization
 
-    init(viewModel: MovieDetailsViewModelProtocol) {
+    init(viewModel: DetailsViewModelProtocol) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
     }
@@ -114,31 +107,31 @@ final class DetailsViewController: UIViewController {
         setupImages()
         setupDetails()
         getTrailer()
+        setupSelectors()
     }
 
     // MARK: - Actions
 
     @objc private func trailerButtonDidTap() {
-        viewModel.navigateToTrailer()
+        guard let trailerUrlString = viewModel.trailerURLString else { return }
+        coordinator?.showTrailer(with: trailerUrlString)
     }
 
     @objc private func didTapPosterImageView() {
-        viewModel.navigateToFullscreenPosterImage()
+        guard let posterImageURLString = viewModel.movieDetails.posterImageURLString else { return }
+        coordinator?.showPoster(with: posterImageURLString)
     }
 
     @objc private func didTapBackButton() {
-        viewModel.pop()
+        navigationController?.popViewController(animated: true)
     }
 
     // MARK: - Interactions
 
     private func getTrailer() {
-        activityIndicator.startAnimating()
         viewModel.getLatestTrailer { [weak self] hasTrailer in
             guard let self else { return }
             DispatchQueue.main.async {
-                self.activityIndicator.stopAnimating()
-                self.activityIndicator.removeFromSuperview()
                 self.movieTrailerImageView.isHidden = !hasTrailer
                 self.movieTrailerPlaceholder.isHidden = hasTrailer
             }
@@ -165,16 +158,16 @@ final class DetailsViewController: UIViewController {
                                    right: view.rightAnchor)
         containerScrollView.addSubview(verticalContainerStackView)
         verticalContainerStackView.anchor(top: containerScrollView.topAnchor,
-                         left: containerScrollView.leftAnchor,
-                         bottom: containerScrollView.bottomAnchor,
-                         right: containerScrollView.rightAnchor,
-                         paddingLeft: mediumPadding,
-                         paddingRight: mediumPadding)
+                                          left: containerScrollView.leftAnchor,
+                                          bottom: containerScrollView.bottomAnchor,
+                                          right: containerScrollView.rightAnchor,
+                                          paddingLeft: mediumPadding,
+                                          paddingRight: mediumPadding)
         verticalContainerStackView.setWidth(view.frame.width - mediumPadding * 2)
         verticalContainerStackView.addArrangedSubview(posterImageView)
-        posterImageView.setDimensions(height: view.frame.width, width: view.frame.width * posterAspectRatio)
         posterImageView.addSubview(noPosterLabel)
         noPosterLabel.fillSuperview()
+        posterImageView.setDimensions(height: view.frame.width, width: view.frame.width * posterAspectRatio)
         verticalContainerStackView.addArrangedSubview(titleLabel)
         verticalContainerStackView.addArrangedSubview(countryLabel)
         verticalContainerStackView.addArrangedSubview(horizontalStackView)
@@ -195,13 +188,10 @@ final class DetailsViewController: UIViewController {
     }
 
     private func setupImages() {
-        guard let urlString = viewModel.movieDetails.posterImageURLString, let url = URL(string: urlString)
-        else {
-            noPosterLabel.isHidden = false
-            return
-        }
-        backgroundImageView.kf.setImage(with: url)
-        posterImageView.kf.setImage(with: url) { result in
+        let url = URL(string: viewModel.movieDetails.posterImageURLString ?? "")
+        posterImageView.kf.setImage(with: url,
+                                    options: [.transition(.fade(loaderFadeInterval))]) { [weak self] result in
+            guard let self else { return }
             switch result {
             case .success:
                 self.noPosterLabel.isHidden = true
@@ -209,6 +199,7 @@ final class DetailsViewController: UIViewController {
                 self.noPosterLabel.isHidden = false
             }
         }
+        backgroundImageView.kf.setImage(with: url)
     }
 
     private func setupDetails() {
@@ -226,6 +217,6 @@ final class DetailsViewController: UIViewController {
         let posterTap = UITapGestureRecognizer(target: self, action: #selector(didTapPosterImageView))
         posterImageView.addGestureRecognizer(posterTap)
         let trailerTap = UITapGestureRecognizer(target: self, action: #selector(trailerButtonDidTap))
-        posterImageView.addGestureRecognizer(trailerTap)
+        movieTrailerImageView.addGestureRecognizer(trailerTap)
     }
 }
