@@ -5,17 +5,26 @@
 //  Created by Anton Petrov on 19.10.2023.
 //
 
-import WebKit
 import UIKit
+import WebKit
 
 final class TrailerViewController: UIViewController {
-    // MARK: - UI & properties
+    // MARK: - UI Elements
+
+    private let activityIndicator = UIActivityIndicatorView(style: .large).configure {
+        $0.color = .label
+        $0.hidesWhenStopped = true
+        $0.startAnimating()
+    }
 
     private let webView = WKWebView().configure {
         $0.isOpaque = false
         $0.backgroundColor = .clear
         $0.scrollView.backgroundColor = .clear
     }
+
+    // MARK: - Properties
+
     private let urlString: String
 
     // MARK: - Initialization
@@ -40,13 +49,6 @@ final class TrailerViewController: UIViewController {
         setupCloseButton()
     }
 
-    // MARK: - Actions
-
-    // TODO: coordinator?
-    @objc private func didTapCloseButton() {
-        navigationController?.dismiss(animated: true)
-    }
-
     // MARK: - Setup
 
     private func setupWebView() {
@@ -58,20 +60,24 @@ final class TrailerViewController: UIViewController {
                        right: view.rightAnchor)
         let urlRequest = URLRequest(url: url)
         webView.load(urlRequest)
+        webView.navigationDelegate = self
+        webView.addSubview(activityIndicator)
+        activityIndicator.fillSuperview()
+    }
+}
+
+// MARK: - WKNavigationDelegate
+
+extension TrailerViewController: WKNavigationDelegate {
+    func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
+        activityIndicator.startAnimating()
     }
 
-    private func setupBlur() {
-        let blurEffect = UIBlurEffect(style: traitCollection.userInterfaceStyle == .dark ? .dark : .light)
-        let blurEffectView = UIVisualEffectView(effect: blurEffect)
-        blurEffectView.frame = view.bounds
-        blurEffectView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-        view.insertSubview(blurEffectView, at: 0)
+    func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+        activityIndicator.stopAnimating()
     }
 
-    private func setupCloseButton() {
-        let item = UIBarButtonItem(barButtonSystemItem: .close,
-                                   target: self,
-                                   action: #selector(didTapCloseButton))
-        navigationItem.leftBarButtonItem = item
+    func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
+        activityIndicator.stopAnimating()
     }
 }
