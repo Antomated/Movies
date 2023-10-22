@@ -1,5 +1,5 @@
 //
-//  Coordinator.swift
+//  MainCoordinator.swift
 //  Movies
 //
 //  Created by Anton Petrov on 22.10.2023.
@@ -11,6 +11,7 @@ protocol MainCoordinatorProtocol: Coordinator {
     func showDetails(for movieDetails: MovieDetails)
     func showTrailer(with urlString: String)
     func showPoster(with urlString: String)
+    func showAlert(message: String)
 }
 
 protocol Coordinator: AnyObject {
@@ -54,5 +55,15 @@ final class MainCoordinator: MainCoordinatorProtocol {
         posterModalViewController.modalPresentationStyle = .popover
         navigationController.present(UINavigationController(rootViewController: posterModalViewController),
                                      animated: true)
+    }
+
+    func showAlert(message: String) {
+        let alert = UIAlertController(title: LocalizedKey.errorTitle.localizedString,
+                                      message: message,
+                                      preferredStyle: .alert)
+        let action = UIAlertAction(title: LocalizedKey.errorOkButton.localizedString,
+                                   style: .cancel)
+        alert.addAction(action)
+        navigationController.present(alert, animated: true)
     }
 }

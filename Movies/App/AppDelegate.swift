@@ -4,22 +4,14 @@
 //
 //  Created by Anton Petrov on 18.10.2023.
 //
-// TODO: remove Lint
-// TODO: Renew API key
-// TODO: Consider Ipad layout
-// TODO: Add Launchscreen
-// TODO: Localize
-// TODO: Offline search
-// TODO: safe array access?
-// TODO: loader on details poster
 
 import UIKit
 
 @main
 final class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
-    var mainCoordinator: MainCoordinator?
-    let networkManager = NetworkManager()
+    private var mainCoordinator: MainCoordinator?
+    private let networkManager = NetworkManager()
 
     func application(_ application: UIApplication,
                      didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
