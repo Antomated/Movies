@@ -1,15 +1,14 @@
 //
-//  LocalizedKey.swift
+//  LocalizedKeyswift
 //  Movies
 //
-//  Created by Anton Petrov on 18.10.2023.
+//  Created by Anton Petrov on 18102023
 //
-// TODO: Check with localizable
 
 import Foundation
 
 enum LocalizedKey: String {
-    // MARK: - Search screen
+    // MARK: - Search scene
 
     case searchScreenTitle
     case searchPlaceholder
@@ -21,15 +20,37 @@ enum LocalizedKey: String {
 
     // MARK: - Sort options
 
-    case sortByPopularity
+    case sortByDefault
     case sortByRatingAscending
     case sortByRatingDescending
     case sortByNameAscending
     case sortByNameDescending
     case sortByYearAscending
     case sortByYearDescending
+    case sortByVotesAscending
+    case sortByVotesDescending
+
+    // MARK: - Errors
+
+    case errorTitle
+    case errorOkButton
+    case networkErrorNoConnection
+    case networkErrorNoData
+    case networkErrorRequestFailed
+    case networkErrorInvalidData
+    case networkErrorInvalidURL
+    case networkErrorUnauthorized
+    case networkErrorDecodingFailed
+
+    // MARK: - Trailer scene
+
+    case trailerSceneTitle
+
+    // MARK: - Poster scene
+
+    case posterSceneTitle
 
     var localizedString: String {
-        return NSLocalizedString(self.rawValue, comment: "")
+        return NSLocalizedString(rawValue, comment: "")
     }
 }

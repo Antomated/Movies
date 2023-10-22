@@ -6,5 +6,44 @@
   
 */
 
-// MARK: - Onboarding screen
+// MARK: - Search scene
 
+"searchScreenTitle" = "К І Н О";
+"searchPlaceholder" = "Пошук";
+"noResultsLabel" = "Фільмів не знайдено";
+"noPosterLabel" = "Немає постера\n\n¯\\_(ツ)_/¯";
+"pullToRefresh" = "Потягніть ↓ щоб перезавантажити";
+
+// MARK: - Sort action sheet
+
+"sortOptionsTitle" = "Сортувати за:";
+"sortOptionsCancelButton" = "Скасувати";
+"sortByDefault" = "замовчуванням";
+"sortByRatingAscending" = "рейтинг ↗";
+"sortByRatingDescending" = "рейтинг ↘";
+"sortByNameAscending" = "ім'ям ↗";
+"sortByNameDescending" = "ім'ям ↘";
+"sortByYearAscending" = "роком ↗";
+"sortByYearDescending" = "роком ↘";
+"sortByVotesAscending" = "голосами ↗";
+"sortByVotesDescending" = "голосами ↘";
+
+// MARK: - Errors
+
+"errorTitle" = "Помилка";
+"errorOkButton" = "OK";
+"networkErrorNoConnection" = "Ви офлайн. Будь ласка, увімкніть Wi-Fi або підключіться за допомогою мобільних даних.";
+"networkErrorNoDataAvailable" = "Даних немає";
+"networkErrorRequestFailed" = "Запит не вдався через: ";
+"networkErrorInvalidDataReceived" = "Отримані недійсні дані";
+"networkErrorInvalidURL" = "Недійсний URL";
+"networkErrorUnauthorizedAccess" = "Неавторизований доступ";
+"networkErrorDecodingFailed" = "Помилка декодування: ";
+
+// MARK: - Trailer scene
+
+"trailerSceneTitle" = "Трейлер";
+
+// MARK: - Poster scene
+
+"posterSceneTitle" = "Постер";

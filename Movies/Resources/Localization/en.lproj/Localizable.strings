@@ -6,22 +6,46 @@
   
 */
 
-// MARK: - Search screen
+// MARK: - Search scene
 
 "searchScreenTitle" = "M O V I E S";
 "searchPlaceholder" = "Search";
-"noResultsLabel" = "No results available";
-"noPosterLabel" = "No poster available";
+"noResultsLabel" = "No movies found";
+"noPosterLabel" = "No poster\n\n¯\\_(ツ)_/¯";
 "pullToRefresh" = "Pull ↓ to reload";
 
 // MARK: - Sort action sheet
 
 "sortOptionsTitle" = "Sort by:";
 "sortOptionsCancelButton" = "Cancel";
-"sortByPopularity" = "popularity ↓";
-"sortByRatingAscending" = "rating ↑";
-"sortByRatingDescending" = "rating ↓";
-"sortByNameAscending" = "name ↑";
-"sortByNameDescending" = "name ↓";
-"sortByYearAscending" = "year ↑";
-"sortByYearDescending" = "year ↓";
+"sortByDefault" = "default";
+"sortByRatingAscending" = "rating ↗";
+"sortByRatingDescending" = "rating ↘";
+"sortByNameAscending" = "name ↗";
+"sortByNameDescending" = "name ↘";
+"sortByYearAscending" = "year ↗";
+"sortByYearDescending" = "year ↘";
+"sortByVotesAscending" = "votes ↗";
+"sortByVotesDescending" = "votes ↘";
+
+// MARK: - Errors
+
+"errorTitle" = "Error";
+"errorOkButton" = "OK";
+"sortByVotesDescending" = "votes ↘";
+"networkErrorNoConnection" = "You are offline. Please, enable your Wi-Fi or connect using cellular data.";
+"networkErrorNoDataAvailable" = "No data available";
+"networkErrorRequestFailed" = "Request failed due to: ";
+"networkErrorInvalidDataReceived" = "Invalid data received";
+"networkErrorInvalidURL" = "Invalid URL";
+"networkErrorUnauthorizedAccess" = "Unauthorized access";
+"networkErrorDecodingFailed" = "Decoding failed due to: ";
+
+
+// MARK: - Trailer scene
+
+"trailerSceneTitle" = "Trailer";
+
+// MARK: - Poster scene
+
+"posterSceneTitle" = "Poster";
