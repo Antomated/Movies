@@ -6,24 +6,24 @@ The app was developed within a **4-day sprint** according to specific test task 
 
 | Search | Details | Trailer |
 | :----------: | :---------: | :---------: |
-<img src = "https://github.com/beaveancodes/Movies/assets/147705874/06d5c65f-e259-46f7-81e2-eb3d8b5e8992" width=300> |<img src="https://github.com/beaveancodes/Movies/assets/147705874/b8e55e6c-1b25-4ace-8a78-0585d5dc95ec"  width=300> |<img src="https://github.com/beaveancodes/Movies/assets/147705874/0350ee37-4207-43aa-a552-d1ce456c1a2a"  width=300> |
+<img src = "https://github.com/Beavean/Movies/assets/105853157/1ac4b960-5881-48ec-a90c-0c03f4a70562" width=300> |<img src="https://github.com/Beavean/Movies/assets/105853157/6a518ab3-197f-45b6-934e-8b0600eac502"  width=300> |<img src="https://github.com/Beavean/Movies/assets/105853157/c0effce1-3a78-4757-bb97-61bf587951be"  width=300> |
 
+## Key Features
 
-## Features
-
+* Light/Dark appearance support
 * The Movie Database API for data source
-* iOS 15
+* iOS 15+
 * UIKit
 * MVVM+Coordinator
-* Programmatic UI
+* Programmatic UI without storyboards
 * Diverse search result sort options
 * Pagination
 * 4 screens with different elements
-* Separate services
+* Separate network service
 * Basic Error handling
-* Basic DI
+* Basic dependency injection
 * Minimum dependencies: Alamofire & Kingfisher
-* Light/Dark appearance support
+* Localization
 
 ## Completed task requirements
 
