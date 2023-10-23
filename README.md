@@ -1,6 +1,6 @@
 # Movies
 
-The app was developed within a **4-day sprint** according to specific test task requirements
+The app was developed according to specific test task requirements
 
 ### Dark appearance with English localization 
 
