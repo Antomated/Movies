@@ -31,22 +31,14 @@
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="N A T I F E" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Sms-Hl-yh8">
-                                <rect key="frame" x="165" y="786.33333333333337" width="63" height="15.666666666666629"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="13"/>
-                                <nil key="textColor"/>
-                                <nil key="highlightedColor"/>
-                            </label>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="V6Q-Tg-PAY" secondAttribute="trailing" constant="16" id="327-24-ByD"/>
-                            <constraint firstItem="Sms-Hl-yh8" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="46P-uH-5NJ"/>
                             <constraint firstItem="Cyv-b5-9ur" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="Icv-ph-Lwy"/>
                             <constraint firstItem="V6Q-Tg-PAY" firstAttribute="top" secondItem="Cyv-b5-9ur" secondAttribute="bottom" constant="8" symbolic="YES" id="RZD-7u-4Dg"/>
                             <constraint firstItem="Cyv-b5-9ur" firstAttribute="centerY" secondItem="Ze5-6b-2t3" secondAttribute="centerY" id="Xio-S8-cJe"/>
-                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="Sms-Hl-yh8" secondAttribute="bottom" constant="16" id="ZbV-uh-Gc3"/>
                             <constraint firstItem="V6Q-Tg-PAY" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="16" id="fqv-ap-liI"/>
                         </constraints>
                     </view>
