@@ -33,57 +33,57 @@ The app was developed according to specific test task requirements
 
 ## Completed task requirements
 
-✓ Displays a list of movies with details.
+✓ Displays a list of movies with details
 
-✓ Uses The Movie Database API for data source.
+✓ Uses The Movie Database API for data source
 
-✓ Minimum supported OS: iOS 15.0.
+✓ Minimum supported OS: iOS 15.0
 
 ✓ Networking: Alamofire
 
 ✓ Architecture: MVVM
 
-✓ Layout: UIKit + Autolayout (Programmatic or Interface Builder).
+✓ Layout: UIKit + Autolayout (Programmatic or Interface Builder)
 
-✓ Data parsing: Codable protocol.
+✓ Data parsing: Codable protocol
 
-✓ Implements Dependency Injection.
+✓ Implements Dependency Injection
 
-✓ Error Handling: Displays native alert with title "Error".
+✓ Error Handling: Displays native alert with title "Error"
 
-✓ Handle no internet connectivity: Shows alert.
+✓ Handle no internet connectivity: Shows alert
 
-✓ Implements pull to refresh for fresh data load.
+✓ Implements pull to refresh for fresh data load
 
-✓ Libraries: SwiftPackageManager.
+✓ Libraries: SwiftPackageManager
 
-✓ Displays activity indicator on network requests.
+✓ Displays activity indicator on network requests
 
-✓ Handles empty states for no results in the list.
+✓ Handles empty states for no results in the list
 
-✓ Uses Git repository with the basic git flow.
+✓ Uses Git repository with the basic git flow
 
-✓ Displays popular movies in default sorting.
+✓ Displays popular movies in default sorting
 
-✓ Pagination: Loads 20 items per page seamlessly.
+✓ Pagination: Loads 20 items per page seamlessly
 
-✓ Clicking on a movie leads to its details screen.
+✓ Clicking on a movie leads to its details screen
 
 ✓ Displays movie details:
 
-✓ Displays trailer button (only if available).
+✓ Displays trailer button (only if available)
 
-✓ Clicking on poster leads to Screen 3 (modal display of full-size poster).
+✓ Clicking on poster leads to Screen 3 (modal display of full-size poster)
 
-✓ Navigation bar with movie title and back button.
+✓ Navigation bar with movie title and back button
 
-✓ Has modal display of full-size movie poster.
+✓ Has modal display of full-size movie poster
 
-✓ Supports simple offline Mode with previously downloaded movies.
+✓ Supports simple offline Mode with previously downloaded movies
 
-✓ Shows an alert when trying to view details of a movie offline.
+✓ Shows an alert when trying to view details of a movie offline
 
-✓ Implements local search for movie titles when offline.
+✓ Implements local search for movie titles when offline
 
 ✓ Cache images for offline viewing with Kingfisher
 
@@ -91,4 +91,4 @@ The app was developed according to specific test task requirements
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details

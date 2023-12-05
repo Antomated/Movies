@@ -21,6 +21,9 @@ final class TrailerViewController: UIViewController {
         $0.isOpaque = false
         $0.backgroundColor = .clear
         $0.scrollView.backgroundColor = .clear
+        $0.scrollView.bounces = false
+        $0.scrollView.isMultipleTouchEnabled = false
+        $0.scrollView.bouncesZoom = false
     }
 
     // MARK: - Properties

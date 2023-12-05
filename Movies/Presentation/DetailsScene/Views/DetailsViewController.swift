@@ -54,13 +54,13 @@ final class DetailsViewController: UIViewController {
     }
 
     private let movieTrailerImageView = UIImageView().configure {
-        $0.tintColor = .black
+        $0.tintColor = .black.withAlphaComponent(0.7)
         $0.isUserInteractionEnabled = true
         $0.image = Constants.SystemImage.playButton.image
         $0.contentMode = .scaleAspectFill
         $0.backgroundColor = .white
         $0.layer.borderColor = UIColor.white.cgColor
-        $0.layer.borderWidth = 1
+        $0.layer.borderWidth = 4
         $0.isHidden = true
     }
 

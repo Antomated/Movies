@@ -82,7 +82,7 @@ final class RatingView: UIView {
     // MARK: - Setup
 
     private func setupViews() {
-        backgroundColor = .black
+        backgroundColor = .black.withAlphaComponent(0.7)
         layer.addSublayer(diagramLayer)
         setupStackView()
     }
