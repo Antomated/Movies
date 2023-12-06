@@ -8,7 +8,7 @@
 import UIKit
 
 enum Constants {
-    enum StyleDefaults {
+    enum Style {
         static let cornerRadius: CGFloat = 16
         static let mediumPadding: CGFloat = 16
         static let smallPadding: CGFloat = 8

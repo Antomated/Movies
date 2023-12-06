@@ -9,7 +9,8 @@ import Foundation
 
 protocol DetailsViewModelProtocol {
     var movieDetails: MovieDetails { get }
-    var trailerURLString: String? { get }
+    var trailerURL
+: URL? { get }
     func getLatestTrailer(completion: @escaping ((Bool) -> Void))
 }
 
@@ -25,7 +26,7 @@ final class DetailsViewModel: DetailsViewModelProtocol {
 
     private let trailerKey = "trailer"
     private let videoSiteKey = "youtube"
-    private(set) var trailerURLString: String?
+    private(set) var trailerURL: URL?
     private(set) var movieDetails: MovieDetails
 
     // MARK: - Initialization
@@ -45,7 +46,7 @@ final class DetailsViewModel: DetailsViewModelProtocol {
                     completion(false)
                     return
                 }
-                self?.trailerURLString = urlString
+                self?.trailerURL = URL(string: urlString)
                 completion(true)
             case .failure:
                 completion(false)

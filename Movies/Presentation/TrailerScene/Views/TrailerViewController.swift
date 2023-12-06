@@ -28,12 +28,12 @@ final class TrailerViewController: UIViewController {
 
     // MARK: - Properties
 
-    private let urlString: String
+    private let url: URL
 
     // MARK: - Initialization
 
-    init(urlString: String) {
-        self.urlString = urlString
+    init(url: URL) {
+        self.url = url
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -55,7 +55,6 @@ final class TrailerViewController: UIViewController {
     // MARK: - Setup
 
     private func setupWebView() {
-        guard let url = URL(string: urlString) else { return }
         view.addSubview(webView)
         webView.anchor(top: view.safeAreaLayoutGuide.topAnchor,
                        left: view.leftAnchor,

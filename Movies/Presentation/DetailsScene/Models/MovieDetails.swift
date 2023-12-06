@@ -9,7 +9,7 @@ import Foundation
 
 struct MovieDetails {
     let id: Int
-    let genres: [APIGenre]
+    let genres: [GenreDTO]
     let title: String
     let countries: [String]
     let year: String

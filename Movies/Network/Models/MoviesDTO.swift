@@ -1,5 +1,5 @@
 //
-//  APIMovies.swift
+//  MoviesDTO.swift
 //  Movies
 //
 //  Created by Anton Petrov on 20.10.2023.
@@ -7,8 +7,8 @@
 
 import Foundation
 
-struct APIMovies: Codable {
-    let movies: [APIMovie]
+struct MoviesDTO: Codable {
+    let movies: [MovieDTO]
     let totalPages: Int
 
     enum CodingKeys: String, CodingKey {

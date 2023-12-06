@@ -9,5 +9,4 @@ import Foundation
 
 struct Movies {
     let results: [Movie]
-    let totalPages: Int
 }

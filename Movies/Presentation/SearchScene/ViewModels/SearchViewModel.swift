@@ -55,7 +55,7 @@ final class SearchViewModel: SearchViewModelProtocol {
     private var searchString = ""
     private var hasReachedEnd = false
     private(set) var sortOption = SortOption.defaultOption
-    private var genres = [APIGenre]()
+    private var genres = [GenreDTO]()
     var movies: [Movie] {
         switch searchState {
         case .popular:
@@ -169,7 +169,7 @@ final class SearchViewModel: SearchViewModelProtocol {
             switch result {
             case let .success(details):
                 let countries = details.productionCountries.map { $0.name }
-                let year = self.extractYear(from: details.releaseDate)
+                let year = details.releaseDate.extractYear(formatter: self.formatter)
                 let posterURL = self.getImageURL(for: details.posterPath, imageSize: .original)
                 let backdropURL = self.getImageURL(for: details.backdropPath, imageSize: .original)
                 let detail = MovieDetails(id: details.id,
@@ -274,10 +274,10 @@ final class SearchViewModel: SearchViewModelProtocol {
         }
     }
 
-    private func convert(movies: [APIMovie]) -> [Movie] {
+    private func convert(movies: [MovieDTO]) -> [Movie] {
         var result = [Movie]()
         for movie in movies {
-            let year = extractYear(from: movie.releaseDate)
+            let year = movie.releaseDate.extractYear(formatter: formatter)
             let genres = genres.filter { movie.genresIDs.contains($0.id) }
             let mov = Movie(id: movie.id,
                             rating: movie.rating,
@@ -295,19 +295,12 @@ final class SearchViewModel: SearchViewModelProtocol {
         return result
     }
 
-    private func extractYear(from date: String) -> String {
-        guard let date = formatter.date(from: date) else { return "" }
-        let calendar = Calendar.current
-        let year = calendar.component(.year, from: date)
-        return "\(year)"
-    }
-
-    private func handleMoviesResult(_ result: Result<APIMovies, NetworkError>,
+    private func handleMoviesResult(_ result: Result<MoviesDTO, NetworkError>,
                                     completion: @escaping ((Result<Movies, NetworkError>) -> Void)) {
         switch result {
         case let .success(result):
             let movies = convert(movies: result.movies)
-            let list = Movies(results: movies, totalPages: result.totalPages)
+            let list = Movies(results: movies)
             completion(.success(list))
         case let .failure(error):
             if case NetworkError.noConnection = error {

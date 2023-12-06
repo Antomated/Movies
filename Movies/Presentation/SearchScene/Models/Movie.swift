@@ -15,6 +15,6 @@ struct Movie {
     let title: String
     let posterImageURLString: String?
     let backdropImageURLString: String?
-    let genres: [APIGenre]
+    let genres: [GenreDTO]
     let video: Bool
 }

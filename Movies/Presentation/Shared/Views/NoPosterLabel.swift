@@ -25,7 +25,7 @@ final class NoPosterLabel: UILabel {
         self.backgroundColor = .black
         self.numberOfLines = 0
         self.textAlignment = .center
-        self.layer.cornerRadius = Constants.StyleDefaults.cornerRadius
+        self.layer.cornerRadius = Constants.Style.cornerRadius
         self.clipsToBounds = true
         self.font = .boldSystemFont(ofSize: 20)
     }

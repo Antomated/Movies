@@ -11,14 +11,14 @@ typealias NetworkManagerProtocol = DetailsNetworkManagerProtocol & SearchNetwork
 
 protocol SearchNetworkManagerProtocol {
     var isConnected: Bool { get }
-    func getPopularMovies(page: Int, completion: @escaping ((Result<APIMovies, NetworkError>) -> Void))
-    func getMovies(forQuery: String, page: Int, completion: @escaping ((Result<APIMovies, NetworkError>) -> Void))
-    func getDetailsForMovie(id: Int, completion: @escaping ((Result<APIMovieDetails, NetworkError>) -> Void))
-    func getGenres(completion: @escaping ((Result<APIGenres, NetworkError>) -> Void))
+    func getPopularMovies(page: Int, completion: @escaping ((Result<MoviesDTO, NetworkError>) -> Void))
+    func getMovies(forQuery: String, page: Int, completion: @escaping ((Result<MoviesDTO, NetworkError>) -> Void))
+    func getDetailsForMovie(id: Int, completion: @escaping ((Result<MovieDetailsDTO, NetworkError>) -> Void))
+    func getGenres(completion: @escaping ((Result<GenresDTO, NetworkError>) -> Void))
 }
 
 protocol DetailsNetworkManagerProtocol {
-    func getVideos(for movieID: Int, completion: @escaping ((Result<APIVideos, NetworkError>) -> Void))
+    func getVideos(for movieID: Int, completion: @escaping ((Result<VideosDTO, NetworkError>) -> Void))
 }
 
 final class NetworkManager {
@@ -82,29 +82,29 @@ extension NetworkManager: SearchNetworkManagerProtocol {
         reachabilityManager?.isReachable ?? false
     }
 
-    func getGenres(completion: @escaping ((Result<APIGenres, NetworkError>) -> Void)) {
+    func getGenres(completion: @escaping ((Result<GenresDTO, NetworkError>) -> Void)) {
         request(.genres) { [weak self] result in
-            self?.decodeData(of: APIGenres.self, from: result, completion: completion)
+            self?.decodeData(of: GenresDTO.self, from: result, completion: completion)
         }
     }
 
     func getMovies(forQuery query: String,
                    page: Int,
-                   completion: @escaping ((Result<APIMovies, NetworkError>) -> Void)) {
+                   completion: @escaping ((Result<MoviesDTO, NetworkError>) -> Void)) {
         request(.search(query: query, page: page)) { [weak self] result in
-            self?.decodeData(of: APIMovies.self, from: result, completion: completion)
+            self?.decodeData(of: MoviesDTO.self, from: result, completion: completion)
         }
     }
 
-    func getPopularMovies(page: Int, completion: @escaping ((Result<APIMovies, NetworkError>) -> Void)) {
+    func getPopularMovies(page: Int, completion: @escaping ((Result<MoviesDTO, NetworkError>) -> Void)) {
         request(.popular(page: page)) { [weak self] result in
-            self?.decodeData(of: APIMovies.self, from: result, completion: completion)
+            self?.decodeData(of: MoviesDTO.self, from: result, completion: completion)
         }
     }
 
-    func getDetailsForMovie(id: Int, completion: @escaping ((Result<APIMovieDetails, NetworkError>) -> Void)) {
+    func getDetailsForMovie(id: Int, completion: @escaping ((Result<MovieDetailsDTO, NetworkError>) -> Void)) {
         request(.details(movieID: id)) { [weak self] result in
-            self?.decodeData(of: APIMovieDetails.self, from: result, completion: completion)
+            self?.decodeData(of: MovieDetailsDTO.self, from: result, completion: completion)
         }
     }
 }
@@ -112,9 +112,9 @@ extension NetworkManager: SearchNetworkManagerProtocol {
 // MARK: - DetailsNetworkManagerProtocol
 
 extension NetworkManager: DetailsNetworkManagerProtocol {
-    func getVideos(for movieID: Int, completion: @escaping ((Result<APIVideos, NetworkError>) -> Void)) {
+    func getVideos(for movieID: Int, completion: @escaping ((Result<VideosDTO, NetworkError>) -> Void)) {
         request(.videos(movieID: movieID)) { [weak self] result in
-            self?.decodeData(of: APIVideos.self, from: result, completion: completion)
+            self?.decodeData(of: VideosDTO.self, from: result, completion: completion)
         }
     }
 }

@@ -52,7 +52,7 @@ final class SearchViewController: UIViewController {
     private let viewModel: SearchViewModelProtocol
     private let checkedActionSheetKey = "checked"
     private let cellToScreenHeightRatio: CGFloat = 1 / 3
-    private let mediumPadding = Constants.StyleDefaults.mediumPadding
+    private let mediumPadding = Constants.Style.mediumPadding
 
     private var isLoading = false {
         didSet {

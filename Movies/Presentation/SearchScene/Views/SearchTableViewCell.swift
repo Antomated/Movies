@@ -12,7 +12,7 @@ final class SearchTableViewCell: UITableViewCell {
     // MARK: - UI Elements
 
     private let containerView = UIView().configure {
-        $0.layer.cornerRadius = Constants.StyleDefaults.cornerRadius
+        $0.layer.cornerRadius = Constants.Style.cornerRadius
         $0.layer.shadowColor = UIColor.darkGray.cgColor
         $0.layer.shadowOffset = CGSize(width: 3, height: 3)
         $0.layer.shadowRadius = 3
@@ -25,7 +25,7 @@ final class SearchTableViewCell: UITableViewCell {
         $0.kf.indicatorType = .activity
         $0.contentMode = .scaleAspectFill
         $0.clipsToBounds = true
-        $0.layer.cornerRadius = Constants.StyleDefaults.cornerRadius
+        $0.layer.cornerRadius = Constants.Style.cornerRadius
     }
 
     private let gradientLayer = CAGradientLayer().configure {
@@ -67,9 +67,9 @@ final class SearchTableViewCell: UITableViewCell {
     // MARK: - Properties
 
     static let reuseIdentifier = String(describing: SearchTableViewCell.self)
-    private let smallPadding = Constants.StyleDefaults.smallPadding
-    private let mediumPadding = Constants.StyleDefaults.mediumPadding
-    private let bigItemSideSize = Constants.StyleDefaults.bigItemSideSize
+    private let smallPadding = Constants.Style.smallPadding
+    private let mediumPadding = Constants.Style.mediumPadding
+    private let bigItemSideSize = Constants.Style.bigItemSideSize
     private let loaderFadeInterval: TimeInterval = 0.3
 
     // MARK: - Initialization
@@ -112,7 +112,7 @@ final class SearchTableViewCell: UITableViewCell {
     func configure(with movie: Movie) {
         titleLabel.text = movie.title
         yearLabel.text = movie.year
-        genresLabel.text = movie.genres.map { $0.name }.joined(separator: Constants.StyleDefaults.pointSeparator)
+        genresLabel.text = movie.genres.map { $0.name }.joined(separator: Constants.Style.pointSeparator)
         ratingView.configure(withRating: movie.rating, votes: movie.votes)
         let url = URL(string: movie.backdropImageURLString ?? movie.posterImageURLString ?? "")
         posterImageView.kf.setImage(with: url,

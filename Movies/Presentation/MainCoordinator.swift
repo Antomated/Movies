@@ -8,9 +8,9 @@
 import UIKit
 
 protocol MainCoordinatorProtocol: Coordinator {
-    func showDetails(for movieDetails: MovieDetails)
-    func showTrailer(with urlString: String)
-    func showPoster(with urlString: String)
+    func showDetails(for: MovieDetails)
+    func showTrailer(with: URL)
+    func showPoster(with: String)
     func showAlert(message: String)
 }
 
@@ -43,8 +43,8 @@ final class MainCoordinator: MainCoordinatorProtocol {
         navigationController.pushViewController(detailsViewController, animated: true)
     }
 
-    func showTrailer(with urlString: String) {
-        let trailerVC = TrailerViewController(urlString: urlString)
+    func showTrailer(with url: URL) {
+        let trailerVC = TrailerViewController(url: url)
         trailerVC.modalPresentationStyle = .popover
         navigationController.present(UINavigationController(rootViewController: trailerVC),
                                      animated: true)

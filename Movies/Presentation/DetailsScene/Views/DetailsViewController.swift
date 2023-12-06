@@ -16,7 +16,7 @@ final class DetailsViewController: UIViewController {
     private let verticalContainerStackView = UIStackView().configure {
         $0.axis = .vertical
         $0.alignment = .center
-        $0.spacing = Constants.StyleDefaults.mediumPadding
+        $0.spacing = Constants.Style.mediumPadding
     }
 
     private let posterImageView = UIImageView().configure {
@@ -24,7 +24,7 @@ final class DetailsViewController: UIViewController {
         $0.kf.indicatorType = .activity
         $0.layer.shadowRadius = 10
         $0.layer.shadowOpacity = 0.6
-        $0.layer.cornerRadius = Constants.StyleDefaults.cornerRadius
+        $0.layer.cornerRadius = Constants.Style.cornerRadius
         $0.clipsToBounds = true
         $0.isUserInteractionEnabled = true
     }
@@ -79,8 +79,8 @@ final class DetailsViewController: UIViewController {
 
     weak var coordinator: MainCoordinatorProtocol?
     private let viewModel: DetailsViewModelProtocol
-    private let mediumPadding = Constants.StyleDefaults.mediumPadding
-    private let bigItemSideSize = Constants.StyleDefaults.bigItemSideSize
+    private let mediumPadding = Constants.Style.mediumPadding
+    private let bigItemSideSize = Constants.Style.bigItemSideSize
     private let lineSeparator = "\n"
     private let posterAspectRatio: CGFloat = 10 / 15
     private let loaderFadeInterval: TimeInterval = 0.3
@@ -113,8 +113,8 @@ final class DetailsViewController: UIViewController {
     // MARK: - Actions
 
     @objc private func trailerButtonDidTap() {
-        guard let trailerUrlString = viewModel.trailerURLString else { return }
-        coordinator?.showTrailer(with: trailerUrlString)
+        guard let trailerURL = viewModel.trailerURL else { return }
+        coordinator?.showTrailer(with: trailerURL)
     }
 
     @objc private func didTapPosterImageView() {

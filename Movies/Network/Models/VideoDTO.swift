@@ -1,5 +1,5 @@
 //
-//  APIVideo.swift
+//  VideoDTO.swift
 //  Movies
 //
 //  Created by Anton Petrov on 20.10.2023.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct APIVideo: Codable {
+struct VideoDTO: Codable {
     let publishedAt: String
     let site: String
     let type: String
