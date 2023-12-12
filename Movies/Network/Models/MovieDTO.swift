@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct MovieDTO: Codable {
+struct MovieDTO: Decodable {
     let id: Int
     let rating: Double
     let votes: Int

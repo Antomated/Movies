@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct VideoDTO: Codable {
+struct VideoDTO: Decodable {
     let publishedAt: String
     let site: String
     let type: String

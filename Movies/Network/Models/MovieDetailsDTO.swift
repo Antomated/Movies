@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct MovieDetailsDTO: Codable {
+struct MovieDetailsDTO: Decodable {
     let id: Int
     let title: String
     let releaseDate: String

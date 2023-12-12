@@ -7,6 +7,6 @@
 
 import Foundation
 
-struct VideosDTO: Codable {
+struct VideosDTO: Decodable {
     let results: [VideoDTO]
 }

@@ -7,6 +7,6 @@
 
 import Foundation
 
-struct CountriesDTO: Codable {
+struct CountriesDTO: Decodable {
     let name: String
 }

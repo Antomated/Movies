@@ -7,6 +7,6 @@
 
 import Foundation
 
-struct GenresDTO: Codable {
+struct GenresDTO: Decodable {
     let genres: [GenreDTO]
 }

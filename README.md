@@ -45,7 +45,7 @@ The app was developed according to specific test task requirements
 
 ✓ Layout: UIKit + Autolayout (Programmatic or Interface Builder)
 
-✓ Data parsing: Codable protocol
+✓ Data parsing: Decodable protocol
 
 ✓ Implements Dependency Injection
 

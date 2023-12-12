@@ -58,7 +58,7 @@ final class NetworkManager {
             }
     }
 
-    private func decodeData<T: Codable>(of type: T.Type,
+    private func decodeData<T: Decodable>(of type: T.Type,
                                         from result: Result<Data, NetworkError>,
                                         completion: @escaping ((Result<T, NetworkError>) -> Void)) {
         switch result {
