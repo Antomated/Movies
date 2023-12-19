@@ -56,7 +56,7 @@ final class DetailsViewController: UIViewController {
     private let movieTrailerImageView = UIImageView().configure {
         $0.tintColor = .black.withAlphaComponent(0.7)
         $0.isUserInteractionEnabled = true
-        $0.image = Constants.SystemImage.playButton.image
+        $0.image = SystemImage.playButton.image
         $0.contentMode = .scaleAspectFill
         $0.backgroundColor = .white
         $0.layer.borderColor = UIColor.white.cgColor
@@ -77,7 +77,7 @@ final class DetailsViewController: UIViewController {
 
     // MARK: - Properties
 
-    weak var coordinator: MainCoordinatorProtocol?
+    weak var coordinator: MainCoordinator?
     private let viewModel: DetailsViewModelProtocol
     private let mediumPadding = Constants.Style.mediumPadding
     private let bigItemSideSize = Constants.Style.bigItemSideSize
@@ -142,7 +142,7 @@ final class DetailsViewController: UIViewController {
 
     private func setupNavigationBar() {
         title = viewModel.movieDetails.title
-        let icon = Constants.SystemImage.backButton.image
+        let icon = SystemImage.backButton.image
         let item = UIBarButtonItem(image: icon, style: .plain, target: self, action: #selector(didTapBackButton))
         navigationItem.leftBarButtonItem = item
     }

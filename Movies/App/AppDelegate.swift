@@ -10,8 +10,9 @@ import UIKit
 @main
 final class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
-    private var mainCoordinator: MainCoordinator?
-    private let networkManager = NetworkManager()
+    private lazy var mainCoordinator =  MainCoordinator(navigationController: navigationController)
+    private lazy var navigationController = UINavigationController()
+
 
     func application(_ application: UIApplication,
                      didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
@@ -19,11 +20,8 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
         window?.makeKeyAndVisible()
         window?.backgroundColor = .systemBackground
         window?.tintColor = .label
-        let navigationController = UINavigationController()
         window?.rootViewController = navigationController
-        mainCoordinator = MainCoordinator(navigationController: navigationController,
-                                          networkManager: networkManager)
-        mainCoordinator?.start()
+        mainCoordinator.start()
         return true
     }
 }

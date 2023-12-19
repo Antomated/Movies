@@ -7,26 +7,17 @@
 
 import UIKit
 
-protocol MainCoordinatorProtocol: Coordinator {
-    func showDetails(for: MovieDetails)
-    func showTrailer(with: URL)
-    func showPoster(with: String)
-    func showAlert(message: String)
-}
-
 protocol Coordinator: AnyObject {
     var navigationController: UINavigationController { get set }
     func start()
 }
 
-final class MainCoordinator: MainCoordinatorProtocol {
+final class MainCoordinator: Coordinator {
     var navigationController: UINavigationController
-    private let networkManager: NetworkManagerProtocol
+    private lazy var networkManager = NetworkManager()
 
-    init(navigationController: UINavigationController,
-         networkManager: NetworkManagerProtocol) {
+    init(navigationController: UINavigationController) {
         self.navigationController = navigationController
-        self.networkManager = networkManager
     }
 
     func start() {

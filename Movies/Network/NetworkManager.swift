@@ -7,8 +7,6 @@
 import Alamofire
 import Foundation
 
-typealias NetworkManagerProtocol = DetailsNetworkManagerProtocol & SearchNetworkManagerProtocol
-
 protocol SearchNetworkManagerProtocol {
     var isConnected: Bool { get }
     func getPopularMovies(page: Int, completion: @escaping ((Result<MoviesDTO, NetworkError>) -> Void))

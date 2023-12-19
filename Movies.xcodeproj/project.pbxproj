@@ -12,6 +12,7 @@
 		3A3930842AE083B1004CB6C9 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 3A3930832AE083B1004CB6C9 /* Alamofire */; };
 		3A5132212AE5954E00D865F5 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 3A5132202AE5954E00D865F5 /* README.md */; };
 		3A5132232AE598C600D865F5 /* LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = 3A5132222AE598C600D865F5 /* LICENSE */; };
+		3A69480D2B3252610056C9C6 /* SystemImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A69480C2B3252610056C9C6 /* SystemImage.swift */; };
 		3A945DB22B1FD95500FF58A8 /* String+ExtractYear.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A945DB12B1FD95500FF58A8 /* String+ExtractYear.swift */; };
 		3ACF5A9D2AE08FAB00FE50E5 /* Configurable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3ACF5A9C2AE08FAB00FE50E5 /* Configurable.swift */; };
 		3ACF5A9F2AE091BD00FE50E5 /* SearchViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3ACF5A9E2AE091BD00FE50E5 /* SearchViewModel.swift */; };
@@ -57,6 +58,7 @@
 		3A3930802AE081B3004CB6C9 /* LocalizedKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalizedKey.swift; sourceTree = "<group>"; };
 		3A5132202AE5954E00D865F5 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		3A5132222AE598C600D865F5 /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
+		3A69480C2B3252610056C9C6 /* SystemImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemImage.swift; sourceTree = "<group>"; };
 		3A945DB12B1FD95500FF58A8 /* String+ExtractYear.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+ExtractYear.swift"; sourceTree = "<group>"; };
 		3ACF5A9C2AE08FAB00FE50E5 /* Configurable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Configurable.swift; sourceTree = "<group>"; };
 		3ACF5A9E2AE091BD00FE50E5 /* SearchViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchViewModel.swift; sourceTree = "<group>"; };
@@ -127,6 +129,7 @@
 			isa = PBXGroup;
 			children = (
 				3A39307E2AE07F28004CB6C9 /* Constants.swift */,
+				3A69480C2B3252610056C9C6 /* SystemImage.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -448,6 +451,7 @@
 				3ACF5A9F2AE091BD00FE50E5 /* SearchViewModel.swift in Sources */,
 				3ACF5AE92AE2C23100FE50E5 /* MovieDTO.swift in Sources */,
 				3ACF5ACB2AE1D5E500FE50E5 /* DetailsViewController.swift in Sources */,
+				3A69480D2B3252610056C9C6 /* SystemImage.swift in Sources */,
 				3ACF5AD12AE1D68C00FE50E5 /* PosterViewController.swift in Sources */,
 				3ACF5A9D2AE08FAB00FE50E5 /* Configurable.swift in Sources */,
 				3AD699092AE0775300657B16 /* SearchViewController.swift in Sources */,
