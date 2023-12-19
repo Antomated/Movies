@@ -22,14 +22,4 @@ enum Constants {
         static let youtubeVideoBaseUrl = "https://www.youtube.com/embed/"
         static let apiKey = "7ca62b73f595a418f832f4440f9fb21e"
     }
-
-    enum SystemImage: String {
-        case sortIcon = "arrow.up.arrow.down"
-        case sortAscending = "arrow.up"
-        case sortDescending = "arrow.down"
-        case backButton = "chevron.left"
-        case playButton = "play.circle.fill"
-
-        var image: UIImage? { UIImage(systemName: rawValue) }
-    }
 }
