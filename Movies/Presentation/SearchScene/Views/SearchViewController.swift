@@ -10,7 +10,7 @@ import UIKit
 final class SearchViewController: UIViewController {
     // MARK: - UI Elements
 
-    private lazy var sortButton = UIBarButtonItem(image: Constants.SystemImage.sortIcon.image,
+    private lazy var sortButton = UIBarButtonItem(image: SystemImage.sortIcon.image,
                                                   style: .plain,
                                                   target: self,
                                                   action: #selector(didTapSortButton))
@@ -48,7 +48,7 @@ final class SearchViewController: UIViewController {
 
     // MARK: - Properties
 
-    weak var coordinator: MainCoordinatorProtocol?
+    weak var coordinator: MainCoordinator?
     private let viewModel: SearchViewModelProtocol
     private let checkedActionSheetKey = "checked"
     private let cellToScreenHeightRatio: CGFloat = 1 / 3
@@ -96,27 +96,13 @@ final class SearchViewController: UIViewController {
     }
 
     @objc private func didTapSortButton() {
-        let alertController = UIAlertController(title: nil,
-                                                message: LocalizedKey.sortOptionsTitle.localizedString,
-                                                preferredStyle: .actionSheet)
-        for (index, option) in viewModel.sortOptions.enumerated() {
-            let action = UIAlertAction(title: option, style: .default) { [weak self] _ in
-                self?.viewModel.selectSortOption(atIndex: index)
-                self?.tableView.reloadData()
-            }
-            if index == viewModel.sortOption.rawValue {
-                action.setValue(true, forKey: checkedActionSheetKey)
-            }
-            alertController.addAction(action)
-        }
-        alertController.addAction(UIAlertAction(title: LocalizedKey.sortOptionsCancelButton.localizedString,
-                                                style: .cancel))
+        let alertController = createSortOptionsAlert()
         if let popoverController = alertController.popoverPresentationController {
             popoverController.barButtonItem = sortButton
         }
-
         present(alertController, animated: true)
     }
+
 
     // MARK: - Reload
 
@@ -137,6 +123,25 @@ final class SearchViewController: UIViewController {
     private func showLoadingIndicator() {
         loadingIndicator.startAnimating()
         navigationItem.rightBarButtonItem = UIBarButtonItem(customView: loadingIndicator)
+    }
+
+    private func createSortOptionsAlert() -> UIAlertController {
+        let alertController = UIAlertController(title: nil,
+                                                message: LocalizedKey.sortOptionsTitle.localizedString,
+                                                preferredStyle: .actionSheet)
+        for (index, option) in viewModel.sortOptions.enumerated() {
+            let action = UIAlertAction(title: option, style: .default) { [weak self] _ in
+                self?.viewModel.selectSortOption(atIndex: index)
+                self?.tableView.reloadData()
+            }
+            if index == viewModel.sortOption.rawValue {
+                action.setValue(true, forKey: checkedActionSheetKey)
+            }
+            alertController.addAction(action)
+        }
+        alertController.addAction(UIAlertAction(title: LocalizedKey.sortOptionsCancelButton.localizedString,
+                                                style: .cancel))
+        return alertController
     }
 
     private func setupErrorCallback() {
